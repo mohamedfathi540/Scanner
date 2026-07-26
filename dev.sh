@@ -256,6 +256,15 @@ fi
 # 0. Kill previous sessions
 kill_previous
 
+# 1. Start Docker Infrastructure
+step "Starting Docker infrastructure..."
+if command -v docker &>/dev/null && docker info &>/dev/null 2>&1; then
+    docker compose -f "$SCRIPT_DIR/Docker/docker-compose.dev.yml" up -d
+    success "Docker infra started"
+else
+    warn "Docker not found or not running. Database may fail to connect!"
+fi
+
 # Ensure backend env file exists
 ENV_FILE="$SCRIPT_DIR/SRC/.env"
 if [ ! -f "$ENV_FILE" ]; then
