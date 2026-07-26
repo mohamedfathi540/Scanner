@@ -1,0 +1,46 @@
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+python-dotenv==1.0.1
+pydantic-settings==2.2.1
+aiofiles==23.2.1
+langchain
+langchain-community>=0.0.20
+PyMuPDF==1.24.3
+openai==1.75.0
+cohere==5.5.8
+qdrant-client==1.10.1
+SQLAlchemy==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+psycopg2-binary==2.9.10
+pgvector==0.4.0
+
+# Monitoring and metrics
+prometheus-client==0.21.1
+
+# LLM Providers
+google-genai
+
+# Document Processing
+docx2txt
+numpy
+tqdm
+nltk
+joblib
+thefuzz[speedup]
+jellyfish
+
+# Prescription OCR & Search
+llama-parse
+duckduckgo-search
+httpx
+
+# Local OCR engines (no API key needed)
+opencv-python-headless
+
+# Auth & Rate Limiting
+passlib[bcrypt]>=1.7.4
+pyjwt>=2.8.0
+slowapi>=0.1.9
+email-validator>=2.1.0
