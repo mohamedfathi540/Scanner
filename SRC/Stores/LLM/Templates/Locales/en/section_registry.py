@@ -30,12 +30,31 @@ SECTIONS = {
     },
     "sewing": {
         "name": "Sewing",
-        "name_ar": "الخياطة",
+        "name_ar": "قسم التجميع والتغليف",
         "file_prefix": "HT_Sewing_Report",
-        "prompt_module": None,  # TODO: create sewing_extraction.py
-        "prompt_var": None,
-        "columns": [],          # TODO: define sewing columns
-        "numeric_columns": [],
+        "prompt_module": "Stores.LLM.Templates.Locales.en.sewing_extraction",
+        "prompt_var": "SEWING_EXTRACTION_PROMPT",
+        "columns": [
+            "Item_Name",
+            "Order_No",
+            "Delivered_Sound_Qty",
+            "Delivered_Scrap_Qty",
+            "Samples_10_Percent",
+            "Accepted_Samples",
+            "Rejected_Samples",
+            "Addition",
+            "Resort_Decision",
+            "Production_Qty",
+            "Samples_30_Percent",
+            "Notes",
+            "Final_Sound_Qty",
+            "Final_Scrap_Qty"
+        ],
+        "numeric_columns": [
+            "Delivered_Sound_Qty", "Delivered_Scrap_Qty", "Samples_10_Percent",
+            "Accepted_Samples", "Rejected_Samples", "Addition", "Production_Qty",
+            "Samples_30_Percent", "Final_Sound_Qty", "Final_Scrap_Qty"
+        ],
     },
     "packing": {
         "name": "Packing",
@@ -50,10 +69,27 @@ SECTIONS = {
         "name": "Shoes",
         "name_ar": "الأحذية",
         "file_prefix": "HT_Shoes_Report",
-        "prompt_module": None,  # TODO: create shoes_extraction.py
-        "prompt_var": None,
-        "columns": [],          # TODO: define shoes columns
-        "numeric_columns": [],
+        "prompt_module": "Stores.LLM.Templates.Locales.en.shoes_extraction",
+        "prompt_var": "SHOES_EXTRACTION_PROMPT",
+        "columns": [
+            "Item_Name",
+            "Order_No",
+            "Prod_Sound_Qty",
+            "Prod_Scrap_Qty",
+            "Total_Qty",
+            "Inspect_Sound_Qty",
+            "Inspect_Scrap_Qty",
+            "Repair_Qty",
+            "Repair_Reason",
+            "Notes",
+            "Final_Sound_Qty",
+            "Final_Scrap_Qty"
+        ],
+        "numeric_columns": [
+            "Prod_Sound_Qty", "Prod_Scrap_Qty", "Total_Qty",
+            "Inspect_Sound_Qty", "Inspect_Scrap_Qty", "Repair_Qty", 
+            "Final_Sound_Qty", "Final_Scrap_Qty"
+        ],
     },
 }
 

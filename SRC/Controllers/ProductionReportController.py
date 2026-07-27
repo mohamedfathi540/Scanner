@@ -185,6 +185,8 @@ class ProductionReportController:
         # 2. Parse the response: strip scratchpad, extract JSON
         clean_json = self._extract_json_from_response(json_response)
         
+        logger.info(f"AI Clean JSON: {clean_json}")
+        
         try:
             data = json.loads(clean_json)
         except json.JSONDecodeError:
