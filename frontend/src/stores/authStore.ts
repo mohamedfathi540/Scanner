@@ -13,12 +13,12 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()((set) => ({
     token: 'local-token',
-    userEmail: 'local@rxtract.com',
+    userEmail: 'local@daftar.com',
     isAuthenticated: true,
 
     login: (token, email) =>
         set({ token, userEmail: email, isAuthenticated: true }),
 
     logout: () =>
-        set({ token: 'local-token', userEmail: 'local@rxtract.com', isAuthenticated: true }),
+        set({ token: 'local-token', userEmail: 'local@daftar.com', isAuthenticated: true }),
 }));

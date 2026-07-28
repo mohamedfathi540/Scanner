@@ -1,6 +1,6 @@
-# RxTract API Reference
+# Daftar API Reference
 
-This document describes the REST API endpoints available in RxTract.
+This document describes the REST API endpoints available in Daftar.
 
 Base URL: `http://localhost:8101/api/v1`
 
@@ -16,7 +16,7 @@ Check if the API is running.
 
 ```json
 {
-  "app_name": "RxTract",
+  "app_name": "Daftar",
   "app_version": "0.1"
 }
 ```

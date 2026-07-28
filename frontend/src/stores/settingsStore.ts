@@ -81,7 +81,7 @@ export const useSettingsStore = create<SettingsState>()(
             })),
         }),
         {
-            name: 'rxtract-settings',
+            name: 'daftar-settings',
         }
     )
 );

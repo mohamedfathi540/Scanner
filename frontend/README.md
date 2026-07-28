@@ -1,6 +1,6 @@
-# RxTract Frontend
+# Daftar Frontend
 
-> A modern, accessible React SPA for the RxTract platform -- prescription analysis, RAG-powered document Q&A, and semantic search.
+> A modern, accessible React SPA for the Daftar platform -- prescription analysis, RAG-powered document Q&A, and semantic search.
 
 ---
 
@@ -40,7 +40,7 @@
 ### Prerequisites
 
 - **Node.js** 18+ and **pnpm**
-- Running RxTract API backend (see [root README](../README.md))
+- Running Daftar API backend (see [root README](../README.md))
 
 ### Quick Start
 
@@ -62,7 +62,7 @@ Create a `.env` file (optional -- defaults work for local development):
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `VITE_API_URL` | RxTract API base URL | `http://localhost:8101/api/v1` |
+| `VITE_API_URL` | Daftar API base URL | `http://localhost:8101/api/v1` |
 
 ### Build for Production
 
@@ -75,8 +75,8 @@ Output is generated in the `dist/` directory, ready to be served by Nginx or any
 ### Docker
 
 ```bash
-docker build -t rxtract-frontend .
-docker run -p 80:80 rxtract-frontend
+docker build -t daftar-frontend .
+docker run -p 80:80 daftar-frontend
 ```
 
 ---
@@ -123,7 +123,7 @@ frontend/
 
 ## API Integration
 
-The frontend communicates with the RxTract API via Axios. All data routes require JWT authentication.
+The frontend communicates with the Daftar API via Axios. All data routes require JWT authentication.
 
 ### Authentication Flow
 
@@ -167,4 +167,4 @@ The frontend is fully responsive with:
 
 ## License
 
-Same as the main RxTract project -- see [LICENCE](../LICENCE).
+Same as the main Daftar project -- see [LICENCE](../LICENCE).

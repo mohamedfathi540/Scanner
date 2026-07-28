@@ -546,12 +546,12 @@ class SecurityController(basecontroller):
         }
 
         payload = {
-            "sender": {"email": settings.SENDER_EMAIL, "name": "RxTract System"},
+            "sender": {"email": settings.SENDER_EMAIL, "name": "Daftar System"},
             "to": [{"email": email}],
             "subject": "Verify Your Email Address",
             "htmlContent": (
                 "<html><body>"
-                "<h2>Welcome to RxTract!</h2>"
+                "<h2>Welcome to Daftar!</h2>"
                 f"<p>Click <a href='{verification_link}'>here</a> to verify your email address.</p>"
                 "<p>If you did not create an account, you can safely ignore this email.</p>"
                 "</body></html>"

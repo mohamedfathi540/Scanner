@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export COMPOSE_PROJECT_NAME=daftar
 
 # ─────────────────────────────────────────────────────────
-# RxTract — Stop Development Environment
+# Daftar — Stop Development Environment
 # ─────────────────────────────────────────────────────────
 
 RED='\033[0;31m'
@@ -14,8 +15,8 @@ DIM='\033[2m'
 NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PID_DIR="/tmp/rxtract"
-LOG_DIR="/tmp/rxtract/logs"
+PID_DIR="/tmp/daftar"
+LOG_DIR="/tmp/daftar/logs"
 
 step() {
     echo -e "\n${CYAN}${BOLD}▸ $1${NC}"
@@ -36,7 +37,7 @@ info() {
 echo ""
 echo -e "${RED}${BOLD}  ╔═══════════════════════════════════════════════╗${NC}"
 echo -e "${RED}${BOLD}  ║                                               ║${NC}"
-echo -e "${RED}${BOLD}  ║   Stopping RxTract Development Environment    ║${NC}"
+echo -e "${RED}${BOLD}  ║   Stopping Daftar Development Environment    ║${NC}"
 echo -e "${RED}${BOLD}  ║                                               ║${NC}"
 echo -e "${RED}${BOLD}  ╚═══════════════════════════════════════════════╝${NC}"
 echo ""
@@ -130,6 +131,6 @@ success "PID files and logs cleaned"
 
 echo ""
 echo -e "${GREEN}${BOLD}  ╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}${BOLD}  ║           RxTract stopped. Goodbye!           ║${NC}"
+echo -e "${GREEN}${BOLD}  ║           Daftar stopped. Goodbye!           ║${NC}"
 echo -e "${GREEN}${BOLD}  ╚═══════════════════════════════════════════════╝${NC}"
 echo ""

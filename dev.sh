@@ -6,14 +6,14 @@ if [ -z "${BASH_VERSION:-}" ]; then
 fi
 
 set -euo pipefail
-export COMPOSE_PROJECT_NAME=rxtract
+export COMPOSE_PROJECT_NAME=daftar
 
 # Parse arguments (Removed -d as it is now the default behavior)
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help)
             echo "Usage: $0"
-            echo "Starts the RxTract development environment in the background."
+            echo "Starts the Daftar development environment in the background."
             exit 0
             ;;
         *)
@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ─────────────────────────────────────────────────────────
-# RxTract Development Environment
+# Daftar Development Environment
 # Hybrid mode: Docker for infra, local for app
 # ─────────────────────────────────────────────────────────
 
@@ -41,8 +41,8 @@ NC='\033[0m'
 
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PID_DIR="/tmp/rxtract"
-LOG_DIR="/tmp/rxtract/logs"
+PID_DIR="/tmp/daftar"
+LOG_DIR="/tmp/daftar/logs"
 BACKEND_PID="$PID_DIR/backend.pid"
 FRONTEND_PID="$PID_DIR/frontend.pid"
 CLOUDFLARED_PID="$PID_DIR/cloudflared.pid"
@@ -100,7 +100,7 @@ info() {
 }
 
 # ─────────────────────────────────────────────────────────
-# Kill any previous RxTract processes by PID file
+# Kill any previous Daftar processes by PID file
 # ─────────────────────────────────────────────────────────
 kill_previous() {
     step "Cleaning up any previous sessions..."
@@ -169,7 +169,7 @@ cleanup() {
     trap '' SIGINT SIGTERM
 
     echo ""
-    step "Shutting down RxTract..."
+    step "Shutting down Daftar..."
 
     # Kill frontend
     if [ -f "$FRONTEND_PID" ]; then
@@ -229,7 +229,7 @@ cleanup() {
     # Clean up logs
     rm -rf "$LOG_DIR" 2>/dev/null || true
 
-    echo -e "\n${GREEN}${BOLD}  RxTract shut down cleanly. See you!${NC}\n"
+    echo -e "\n${GREEN}${BOLD}  Daftar shut down cleanly. See you!${NC}\n"
     exit 0
 }
 
@@ -421,7 +421,7 @@ printf -v sp_back '%*s' "$pad_back" ''
 
 echo ""
 echo -e "${GREEN}${BOLD}  ╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}${BOLD}  ║            RxTract is LIVE!                   ║${NC}"
+echo -e "${GREEN}${BOLD}  ║            Daftar is LIVE!                   ║${NC}"
 echo -e "${GREEN}${BOLD}  ╠═══════════════════════════════════════════════╣${NC}"
 echo -e "${GREEN}${BOLD}  ║${NC}                                               ${GREEN}${BOLD}║${NC}"
 echo -e "${GREEN}${BOLD}  ║${NC}  ${CYAN}Frontend     ${NC} → ${WHITE}http://localhost:${PORT_FRONTEND}${NC}${sp_front}${GREEN}${BOLD}║${NC}"
@@ -448,7 +448,7 @@ echo ""
 # ─────────────────────────────────────────────────────────
 # Background mode — completely detach and exit
 # ─────────────────────────────────────────────────────────
-echo -e "\n${GREEN}${BOLD}  RxTract is now running in the background${NC}"
+echo -e "\n${GREEN}${BOLD}  Daftar is now running in the background${NC}"
 echo -e "  ${DIM}Logs:${NC}"
 echo -e "    ${WHITE}Backend  → $LOG_DIR/backend.log${NC}"
 echo -e "    ${WHITE}Frontend → $LOG_DIR/frontend.log${NC}"
@@ -458,7 +458,7 @@ fi
 echo -e "\n  ${DIM}To tail logs:${NC}"
 echo -e "  ${WHITE}tail -f $LOG_DIR/backend.log $LOG_DIR/frontend.log${NC}"
 echo -e "\n  ${DIM}To stop all services manually:${NC}"
-echo -e "  ${WHITE}kill \$(cat /tmp/rxtract/backend.pid 2>/dev/null) \$(cat /tmp/rxtract/frontend.pid 2>/dev/null) \$(cat /tmp/rxtract/cloudflared.pid 2>/dev/null) 2>/dev/null || true${NC}\n"
+echo -e "  ${WHITE}kill \$(cat /tmp/daftar/backend.pid 2>/dev/null) \$(cat /tmp/daftar/frontend.pid 2>/dev/null) \$(cat /tmp/daftar/cloudflared.pid 2>/dev/null) 2>/dev/null || true${NC}\n"
 
 # Disown all background jobs so they survive shell exit/SIGHUP
 disown -a 2>/dev/null || true

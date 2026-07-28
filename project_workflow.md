@@ -1,6 +1,6 @@
-# RxTract Project Workflow
+# Daftar Project Workflow
 
-This document illustrates the end-to-end workflow of the RxTract RAG system, detailing the Data Ingestion Pipeline and the RAG Inference Pipeline.
+This document illustrates the end-to-end workflow of the Daftar RAG system, detailing the Data Ingestion Pipeline and the RAG Inference Pipeline.
 
 ## High-Level Workflow
 

@@ -1,4 +1,4 @@
-# RxTract -- Docker Deployment
+# Daftar -- Docker Deployment
 
 > Complete containerized deployment with application server, databases, and reverse proxy.
 
@@ -17,11 +17,11 @@
 
 | Service | Container Name | Image | Host Port | Internal Port | Purpose |
 |---------|---------------|-------|-----------|---------------|---------|
-| FastAPI | `rxtract_fastapi` | Custom build | 8109 | 8101 | FastAPI application server |
-| Frontend | `rxtract_frontend` | Custom build | 5174 | 80 | React 19 SPA (Nginx-served) |
-| Nginx | `rxtract_nginx` | nginx:latest | 8999 | 80 | Reverse proxy (routes to frontend + API) |
-| PostgreSQL | `rxtract_pgvector` | pgvector/pgvector:0.8.0-pg17 | 5536 | 5432 | PostgreSQL with vector similarity search |
-| Qdrant | `rxtract_qdrant` | qdrant/qdrant:latest | 6337 (HTTP), 6338 (gRPC) | 6333, 6334 | Vector database (alternative to pgvector) |
+| FastAPI | `daftar_fastapi` | Custom build | 8109 | 8101 | FastAPI application server |
+| Frontend | `daftar_frontend` | Custom build | 5174 | 80 | React 19 SPA (Nginx-served) |
+| Nginx | `daftar_nginx` | nginx:latest | 8999 | 80 | Reverse proxy (routes to frontend + API) |
+| PostgreSQL | `daftar_pgvector` | pgvector/pgvector:0.8.0-pg17 | 5536 | 5432 | PostgreSQL with vector similarity search |
+| Qdrant | `daftar_qdrant` | qdrant/qdrant:latest | 6337 (HTTP), 6338 (gRPC) | 6333, 6334 | Vector database (alternative to pgvector) |
 
 ### Development Stack (`docker-compose.dev.yml`)
 
@@ -31,12 +31,12 @@ For local development, databases and a lightweight Nginx gateway run in Docker:
 |---------|---------------|-----------|-------|
 | pgvector | `pgvector` | 5536 | PostgreSQL 17 + pgvector 0.8.0 |
 | qdrant | `qdrant` | 6337, 6338 | Vector database |
-| Nginx (hybrid proxy) | `rxtract_nginx_dev` | 8999 | Proxies to local frontend (`5877`) and local backend (`8101`) |
+| Nginx (hybrid proxy) | `daftar_nginx_dev` | 8999 | Proxies to local frontend (`5877`) and local backend (`8101`) |
 
 Dev stack bind mounts:
 
-- PostgreSQL data -> `/srv/mergerfs/2TB/rxtract_db`
-- Qdrant storage -> `/srv/mergerfs/2TB/rxtract_qdrant`
+- PostgreSQL data -> `/srv/mergerfs/2TB/daftar_db`
+- Qdrant storage -> `/srv/mergerfs/2TB/daftar_qdrant`
 
 > Use `bash dev.sh` from the project root to start the dev stack automatically.
 
@@ -101,8 +101,8 @@ See `SRC/.env.example` for the full variable reference with descriptions.
 
 Routes incoming HTTP requests:
 
-- `/api/v1/*`, `/docs`, `/openapi.json` -> FastAPI (`rxtract_fastapi:8101`)
-- `/` (everything else) -> Frontend (`rxtract_frontend:80`)
+- `/api/v1/*`, `/docs`, `/openapi.json` -> FastAPI (`daftar_fastapi:8101`)
+- `/` (everything else) -> Frontend (`daftar_frontend:80`)
 - `/kfgndfkk4464_fubfd555` -> FastAPI Prometheus metrics endpoint (obfuscated path)
 
 ---
@@ -113,22 +113,22 @@ All data is stored in named Docker volumes:
 
 | Volume | Service | Contains |
 |--------|---------|----------|
-| `rxtract_fastapi_data` | FastAPI | Uploaded assets (mounted at `/app/Assets`) |
-| `rxtract_pgvector_data` | PostgreSQL | Database files, vector indexes |
-| `rxtract_qdrant_data` | Qdrant | Vector collections |
+| `daftar_fastapi_data` | FastAPI | Uploaded assets (mounted at `/app/Assets`) |
+| `daftar_pgvector_data` | PostgreSQL | Database files, vector indexes |
+| `daftar_qdrant_data` | Qdrant | Vector collections |
 
 ### Backup & Restore
 
 ```bash
 # Backup PostgreSQL volume
 docker run --rm \
-  -v rxtract_pgvector_data:/volume \
+  -v daftar_pgvector_data:/volume \
   -v $(pwd):/backup \
   alpine tar cvf /backup/pgvector_backup.tar /volume
 
 # Restore PostgreSQL volume (overwrites existing data)
 docker run --rm \
-  -v rxtract_pgvector_data:/volume \
+  -v daftar_pgvector_data:/volume \
   -v $(pwd):/backup \
   alpine sh -c "cd /volume && tar xvf /backup/pgvector_backup.tar --strip 1"
 
@@ -178,10 +178,10 @@ docker compose up -d
 docker compose down
 
 # Restart specific service
-docker compose restart rxtract_fastapi
+docker compose restart daftar_fastapi
 
 # Rebuild after code changes
-docker compose up -d --build rxtract_fastapi
+docker compose up -d --build daftar_fastapi
 ```
 
 ### Debugging
@@ -191,16 +191,16 @@ docker compose up -d --build rxtract_fastapi
 docker compose logs -f
 
 # Follow specific service logs
-docker compose logs -f rxtract_fastapi
+docker compose logs -f daftar_fastapi
 
 # Shell into application container
-docker exec -it rxtract_fastapi /bin/bash
+docker exec -it daftar_fastapi /bin/bash
 
 # Shell into PostgreSQL
-docker exec -it rxtract_pgvector psql -U postgres
+docker exec -it daftar_pgvector psql -U postgres
 
 # Run migrations manually
-docker exec -it rxtract_fastapi bash -c "cd /app/Models/DB_Schemes/minirag && alembic upgrade head"
+docker exec -it daftar_fastapi bash -c "cd /app/Models/DB_Schemes/minirag && alembic upgrade head"
 ```
 
 ---

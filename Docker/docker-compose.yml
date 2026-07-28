@@ -1,26 +1,26 @@
 services:
   # FastAPI Application
-  rxtract_fastapi:
+  daftar_fastapi:
     build:
       context: ..
       dockerfile: Docker/minirag/Dockerfile
-    container_name: rxtract_fastapi
+    container_name: daftar_fastapi
     ports:
       - "8109:8101"
     volumes:
-      - rxtract_fastapi_data:/app/Assets
+      - daftar_fastapi_data:/app/Assets
       # Forces downloaded AI models to save on the 2TB drive
-      - /srv/mergerfs/2TB/rxtract_hf_cache:/app/cache
+      - /srv/mergerfs/2TB/daftar_hf_cache:/app/cache
     networks:
-      - rxtract_backend
+      - daftar_backend
     restart: always
     depends_on:
-      rxtract_pgvector:
+      daftar_pgvector:
         condition: service_healthy
     env_file:
       - ./env/.env.app
     environment:
-      - POSTGRES_HOST=rxtract_pgvector
+      - POSTGRES_HOST=daftar_pgvector
       - POSTGRES_PORT=5432
       - HF_HOME=/app/cache
     dns:
@@ -35,44 +35,44 @@ services:
           memory: 1G     # Max 1GB RAM
 
   # Frontend Application
-  rxtract_frontend:
+  daftar_frontend:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: rxtract_frontend
+    container_name: daftar_frontend
     ports:
       - "5174:80"
     restart: always
     networks:
-      - rxtract_backend
+      - daftar_backend
 
   # Nginx Service
-  rxtract_nginx:
+  daftar_nginx:
     image: nginx:latest
-    container_name: rxtract_nginx
+    container_name: daftar_nginx
     ports:
       - "8999:80"
     volumes:
       - ./Nginx/Default.conf:/etc/nginx/conf.d/Default.conf
     depends_on:
-      - rxtract_fastapi
+      - daftar_fastapi
     networks:
-      - rxtract_backend
+      - daftar_backend
     restart: always
 
   # PostgreSQL (PGvector)
-  rxtract_pgvector:
+  daftar_pgvector:
     image: pgvector/pgvector:0.8.0-pg17
-    container_name: rxtract_pgvector
+    container_name: daftar_pgvector
     ports:
       - "5536:5432"
     volumes:
       # Moved from Docker volume to the 2TB drive
-      - /srv/mergerfs/2TB/rxtract_db:/var/lib/postgresql/data
+      - /srv/mergerfs/2TB/daftar_db:/var/lib/postgresql/data
     env_file:
       - ./env/.env.postgres
     networks:
-      - rxtract_backend
+      - daftar_backend
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
@@ -89,17 +89,17 @@ services:
           memory: 512M   # Max 512MB RAM
 
   # Qdrant (Vector DB)
-  rxtract_qdrant:
+  daftar_qdrant:
     image: qdrant/qdrant:latest
-    container_name: rxtract_qdrant
+    container_name: daftar_qdrant
     ports:
       - "6337:6333"
       - "6338:6334"
     volumes:
       # Moved from Docker volume to the 2TB drive
-      - /srv/mergerfs/2TB/rxtract_qdrant:/qdrant/storage
+      - /srv/mergerfs/2TB/daftar_qdrant:/qdrant/storage
     networks:
-      - rxtract_backend
+      - daftar_backend
     restart: always
     ulimits:
       core: 0
@@ -110,9 +110,9 @@ services:
           memory: 512M   # Max 512MB RAM
 
 networks:
-  rxtract_backend:
+  daftar_backend:
     driver: bridge
 
 volumes:
-  rxtract_fastapi_data:
-  # rxtract_pgvector_data and rxtract_qdrant_data removed because they are now direct paths on the 2TB drive
+  daftar_fastapi_data:
+  # daftar_pgvector_data and daftar_qdrant_data removed because they are now direct paths on the 2TB drive

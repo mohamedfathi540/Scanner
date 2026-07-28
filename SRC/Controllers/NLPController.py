@@ -238,7 +238,7 @@ class NLPController (basecontroller) :
 
         # Step 2.5: Find real alternatives for found ingredients
         if ingredients_found:
-            alt_lines = ["\n### REAL DATABASE ALTERNATIVES (RXTRACT DATABASE):"]
+            alt_lines = ["\n### REAL DATABASE ALTERNATIVES (DAFTAR DATABASE):"]
             for med_name, ing in ingredients_found:
                 db_alts = matcher.find_medicines_by_ingredient(ing, limit=5)
                 # Filter out the current medicine if it's in the list

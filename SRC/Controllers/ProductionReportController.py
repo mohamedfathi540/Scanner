@@ -71,7 +71,7 @@ def enhance_image_for_ocr(image_bytes: bytes) -> bytes:
 
 class ProductionReportController:
     def __init__(self):
-        # We use the factory pattern from RxTract
+        # We use the factory pattern from Daftar
         settings = get_settings()
         self.ocr_provider = OCRProviderFactory(settings).create("GEMINI")
         self.template_parser = TemplateParser(language='en')

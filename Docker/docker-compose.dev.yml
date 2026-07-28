@@ -2,7 +2,7 @@ services:
   # PostgreSQL (PGvector) — infrastructure only for dev
   pgvector:
     image: pgvector/pgvector:0.8.0-pg17
-    container_name: pgvector
+    container_name: daftar_pgvector
     ports:
       - "5536:5432"
     volumes:
@@ -28,9 +28,9 @@ services:
 
 
   # Nginx reverse proxy for hybrid dev (routes to local backend/frontend)
-  rxtract_nginx_dev:
+  daftar_nginx_dev:
     image: nginx:latest
-    container_name: rxtract_nginx_dev
+    container_name: daftar_nginx_dev
     ports:
       - "8999:80"
     volumes:
