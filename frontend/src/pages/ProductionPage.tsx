@@ -127,68 +127,78 @@ export function ProductionPage() {
         </div>
 
         <div className="w-full max-w-md bg-bg-secondary p-8 rounded-2xl border border-border shadow-sm flex flex-col items-center">
-          <label
-            htmlFor="file-upload"
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`relative w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${
-              isDragging 
-                ? "border-primary-500 bg-primary-50" 
-                : file 
-                  ? "border-primary-500 bg-primary-50/5" 
-                  : "border-border hover:border-primary-400 hover:bg-bg-hover"
-            }`}
-          >
-            {file ? (
-              <div className="text-center space-y-2 relative w-full h-full flex flex-col items-center justify-center">
-                {!isUploading && (
-                  <button
-                    onClick={handleRemoveFile}
-                    className="absolute top-2 right-2 p-1.5 bg-bg-primary border border-border rounded-lg text-text-muted hover:text-error hover:border-error/50 hover:bg-error/5 transition-all"
-                    title="Remove selected image"
-                  >
-                    <XMarkIcon className="w-5 h-5" />
-                  </button>
-                )}
-                <FileSpreadsheet className="w-10 h-10 text-primary-500 mx-auto" />
-                <p className="font-medium text-text-primary truncate px-12 w-full">{file.name}</p>
-                <p className="text-sm text-text-muted">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-              </div>
-            ) : (
-              <div className="text-center space-y-2 pointer-events-none">
-                <ArrowUpTrayIcon className={`w-10 h-10 mx-auto transition-colors ${isDragging ? "text-primary-500" : "text-text-muted"}`} />
-                <p className={`font-medium transition-colors ${isDragging ? "text-primary-600" : "text-text-primary"}`}>
-                  {isDragging ? "Drop image here" : "Click or drag image to upload"}
-                </p>
-                <p className="text-sm text-text-muted">PNG, JPG, JPEG up to 10MB</p>
-              </div>
-            )}
-            <input
-              id="file-upload"
-              type="file"
-              className="hidden"
-              accept="image/png, image/jpeg, image/jpg"
-              onChange={handleFileChange}
-              disabled={isUploading}
-            />
-          </label>
-
-          {error && (
-            <div className="mt-4 p-3 w-full bg-error/10 border border-error/20 rounded-lg text-error text-sm text-center">
-              {error}
+          {section === "packing" ? (
+            <div className="w-full h-64 border-2 border-dashed border-primary-500 bg-primary-50 rounded-xl flex flex-col items-center justify-center space-y-4">
+              <div className="text-5xl">🚧</div>
+              <h2 className="text-2xl font-bold text-primary-700">Under Process</h2>
+              <p className="text-primary-600 font-medium">هذا القسم قيد التنفيذ حالياً</p>
             </div>
-          )}
+          ) : (
+            <>
+              <label
+                htmlFor="file-upload"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`relative w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                  isDragging 
+                    ? "border-primary-500 bg-primary-50" 
+                    : file 
+                      ? "border-primary-500 bg-primary-50/5" 
+                      : "border-border hover:border-primary-400 hover:bg-bg-hover"
+                }`}
+              >
+                {file ? (
+                  <div className="text-center space-y-2 relative w-full h-full flex flex-col items-center justify-center">
+                    {!isUploading && (
+                      <button
+                        onClick={handleRemoveFile}
+                        className="absolute top-2 right-2 p-1.5 bg-bg-primary border border-border rounded-lg text-text-muted hover:text-error hover:border-error/50 hover:bg-error/5 transition-all"
+                        title="Remove selected image"
+                      >
+                        <XMarkIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                    <FileSpreadsheet className="w-10 h-10 text-primary-500 mx-auto" />
+                    <p className="font-medium text-text-primary truncate px-12 w-full">{file.name}</p>
+                    <p className="text-sm text-text-muted">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-2 pointer-events-none">
+                    <ArrowUpTrayIcon className={`w-10 h-10 mx-auto transition-colors ${isDragging ? "text-primary-500" : "text-text-muted"}`} />
+                    <p className={`font-medium transition-colors ${isDragging ? "text-primary-600" : "text-text-primary"}`}>
+                      {isDragging ? "Drop image here" : "Click or drag image to upload"}
+                    </p>
+                    <p className="text-sm text-text-muted">PNG, JPG, JPEG up to 10MB</p>
+                  </div>
+                )}
+                <input
+                  id="file-upload"
+                  type="file"
+                  className="hidden"
+                  accept="image/png, image/jpeg, image/jpg"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                />
+              </label>
 
-          <Button
-            onClick={handleUpload}
-            isDisabled={!file || isUploading}
-            isLoading={isUploading}
-            className="w-full mt-6"
-            size="lg"
-          >
-            {isUploading ? "Extracting..." : `Extract to Excel`}
-          </Button>
+              {error && (
+                <div className="mt-4 p-3 w-full bg-error/10 border border-error/20 rounded-lg text-error text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={handleUpload}
+                isDisabled={!file || isUploading}
+                isLoading={isUploading}
+                className="w-full mt-6"
+                size="lg"
+              >
+                {isUploading ? "Extracting..." : `Extract to Excel`}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
