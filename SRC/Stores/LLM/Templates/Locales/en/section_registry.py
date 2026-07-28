@@ -60,10 +60,30 @@ SECTIONS = {
         "name": "Packing",
         "name_ar": "التعبئة",
         "file_prefix": "HT_Packing_Report",
-        "prompt_module": None,  # TODO: create packing_extraction.py
-        "prompt_var": None,
-        "columns": [],          # TODO: define packing columns
-        "numeric_columns": [],
+        "prompt_module": "Stores.LLM.Templates.Locales.en.packing_extraction",
+        "prompt_var": "PACKING_EXTRACTION_PROMPT",
+        "columns": [
+            "Item_Name",
+            "Order_No",
+            "Prod_Sound_Qty",
+            "Rework_Qty",
+            "Delivered_To_Quality_Qty",
+            "Samples_Count",
+            "Accepted_Samples_Count",
+            "Rejected_Samples_Count",
+            "Production_Decision",
+            "Sorting_Prod_Qty",
+            "Sorting_Samples_Count",
+            "Notes",
+            "Quality_Sound_Qty",
+            "Quality_Scrap_Qty"
+        ],
+        "numeric_columns": [
+            "Prod_Sound_Qty", "Rework_Qty", "Delivered_To_Quality_Qty",
+            "Samples_Count", "Accepted_Samples_Count", "Rejected_Samples_Count",
+            "Sorting_Prod_Qty", "Sorting_Samples_Count", "Quality_Sound_Qty",
+            "Quality_Scrap_Qty"
+        ],
     },
     "shoes": {
         "name": "Shoes",
