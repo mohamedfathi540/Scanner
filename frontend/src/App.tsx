@@ -20,9 +20,9 @@ function App() {
         <Routes>
           {/* ── Main app routes ──────────────────────── */}
           <Route path="/" element={<MainLayout />}>
-            <Route index element={<Navigate to="/scanner/foam" replace />} />
-            <Route path="scanner/:section" element={<ProductionPage />} />
-            <Route path="*" element={<Navigate to="/scanner/foam" replace />} />
+            <Route index element={<Navigate to="/daftar/foam" replace />} />
+            <Route path="daftar/:section" element={<ProductionPage />} />
+            <Route path="*" element={<Navigate to="/daftar/foam" replace />} />
           </Route>
         </Routes>
         <ToastContainer />

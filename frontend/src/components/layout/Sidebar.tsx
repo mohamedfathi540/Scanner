@@ -8,10 +8,10 @@ import { Logo } from "../ui/Logo";
 import { useEffect } from "react";
 
 const navigation = [
-  { name: "Foam - الفوم", href: "/scanner/foam", icon: ClipboardDocumentListIcon },
-  { name: "Sewing - الخياطة", href: "/scanner/sewing", icon: ClipboardDocumentListIcon },
-  { name: "Packing - التعبئة", href: "/scanner/packing", icon: ClipboardDocumentListIcon },
-  { name: "Shoes - الأحذية", href: "/scanner/shoes", icon: ClipboardDocumentListIcon },
+  { name: "Foam - الفوم", href: "/daftar/foam", icon: ClipboardDocumentListIcon },
+  { name: "Sewing - الخياطة", href: "/daftar/sewing", icon: ClipboardDocumentListIcon },
+  { name: "Packing - التعبئة", href: "/daftar/packing", icon: ClipboardDocumentListIcon },
+  { name: "Shoes - الأحذية", href: "/daftar/shoes", icon: ClipboardDocumentListIcon },
 ];
 
 interface SidebarProps {
