@@ -10,18 +10,34 @@ Analyze the attached table image and extract all rows into a strictly structured
 
 ### COLUMN MAPPING (Right-to-Left):
 Map every table column to the following exact JSON keys in order:
-1. "Item_Name"          -> اسم الصنف
+1. "Item_Name"          -> اسم الصنف (RIGHTMOST column)
 2. "Order_No"           -> رقم أمر الانتاج
 3. "Prod_Sound_Qty"     -> سليم
 4. "Prod_Scrap_Qty"     -> هالك
 5. "Total_Qty"          -> العدد الاجمالي
 6. "Inspect_Sound_Qty"  -> سليم (تفتيش الجودة)
-7. "Inspect_Scrap_Qty"  -> هالك (تفتيش الجودة)
-8. "Repair_Qty"         -> الاصلاح
+7. "Inspect_Scrap_Qty"  -> هالك (تفتيش الجودة) - THE COLUMN RIGHT NEXT TO سليم. Default to 0.
+8. "Repair_Qty"         -> الاصلاح - THE COLUMN AFTER هالك (further left). Default to 0. ⚠️ DO NOT SWAP WITH هالك!
 9. "Repair_Reason"      -> سبب الاصلاح
 10. "Notes"             -> ملاحظات
 11. "Final_Sound_Qty"   -> سليم (اجمالي بعد فحص الجودة)
 12. "Final_Scrap_Qty"   -> هالك (اجمالي بعد فحص الجودة)
+
+### ⚠️ ANTI-SWAP WARNING: هالك vs الاصلاح (MOST CRITICAL RULE) ⚠️
+
+You FREQUENTLY SWAP the هالك and الاصلاح columns. This is your #1 error. READ THIS CAREFULLY:
+
+**PHYSICAL LAYOUT of the inspection columns (as they appear on paper, Right-to-Left):**
+
+     ← LEFT side of page                              RIGHT side of page →
+     ... | الاصلاح | هالك | سليم | العدد الاجمالي | ...
+     ... | Col 8   | Col 7 | Col 6 | Col 5          | ...
+
+- **"هالك" (Scrap) is the column IMMEDIATELY to the LEFT of "سليم" (Sound).** It is column #7. → Inspect_Scrap_Qty
+- **"الاصلاح" (Repair) is the column IMMEDIATELY to the LEFT of "هالك" (Scrap).** It is column #8. → Repair_Qty
+
+**SELF-CHECK**: After extracting each row, verify:
+- Is Inspect_Scrap_Qty the number written directly next to سليم? If not, you swapped them. FIX IT.
 
 ### STRICT NUMERAL & ACCURACY RULES:
 1. **Digit Disambiguation**:

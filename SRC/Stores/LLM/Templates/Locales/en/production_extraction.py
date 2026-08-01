@@ -19,8 +19,8 @@ Item_Name | Order_No | Prod_Sound_Qty | Prod_Scrap_Qty | Total_Qty | Inspect_Sou
 
 Example of your thought process:
 <scratchpad>
-Row 1: مخدة كبيرة 60*40 | BLANK | 39 | 2 | 46 | 39 | 2 | 5 | BLANK | BLANK | 44 | 2 | HT → 39+2+5=46 ✓
-Row 2: بواسير كبيرة | 1234 | 50 | 0 | 50 | 48 | 2 | 0 | BLANK | BLANK | 48 | 2 | MAX → 48+2+0=50 ✓
+Row 1: مخدة كبيرة 60*40 | BLANK | 39 | 2 | 46 | سليم=39 | هالك(Scrap)=2 | اصلاح(Repair)=5 | BLANK | BLANK | 44 | 2 | HT → Inspect_Scrap_Qty=2, Repair_Qty=5, check: 39+2+5=46 ✓
+Row 2: بواسير كبيرة | 1234 | 50 | 0 | 50 | سليم=48 | هالك(Scrap)=2 | اصلاح(Repair)=0 | BLANK | BLANK | 48 | 2 | MAX → Inspect_Scrap_Qty=2, Repair_Qty=0, check: 48+2+0=50 ✓
 </scratchpad>
 
 ## ═══════════════════════════════════════════════════════════════════
@@ -34,18 +34,43 @@ Look specifically at the columns under the Inspection section ("الفحص"):
 - If you see handwritten words like "MAX" or "HT" floating above or across these numbers, DO NOT put those words into the Scrap or Repair quantity columns. Extract the number for the quantity, and put "MAX" or "HT" into the "Brand_Repair" column.
 
 ## ═══════════════════════════════════════════════════════════════════
+## ⚠️ ANTI-SWAP WARNING: هالك vs الاصلاح (MOST CRITICAL RULE) ⚠️
+## ═══════════════════════════════════════════════════════════════════
+
+You FREQUENTLY SWAP the هالك and الاصلاح columns. This is your #1 error. READ THIS CAREFULLY:
+
+**PHYSICAL LAYOUT of the inspection columns (as they appear on paper, Right-to-Left):**
+
+     ← LEFT side of page                              RIGHT side of page →
+     ... | الاصلاح | هالك | سليم | العدد الاجمالي | ...
+     ... | Col 8   | Col 7 | Col 6 | Col 5          | ...
+
+- **"هالك" (Scrap) is the column IMMEDIATELY to the LEFT of "سليم" (Sound).** It is column #7.
+  → Its value goes into **Inspect_Scrap_Qty**
+- **"الاصلاح" (Repair) is the column IMMEDIATELY to the LEFT of "هالك" (Scrap).** It is column #8.
+  → Its value goes into **Repair_Qty**
+
+**CONCRETE EXAMPLE**: If a row shows سليم=39, then the number in the NEXT column to the LEFT is هالك (Scrap) e.g. 2, and the number in the column AFTER that (further left) is الاصلاح (Repair) e.g. 5.
+→ Inspect_Sound_Qty=39, Inspect_Scrap_Qty=2, Repair_Qty=5 ✓
+→ Inspect_Sound_Qty=39, Inspect_Scrap_Qty=5, Repair_Qty=2 ✗ WRONG (swapped!)
+
+**SELF-CHECK**: After extracting each row, verify:
+- Is Inspect_Scrap_Qty the number written directly next to سليم? If not, you swapped them. FIX IT.
+- In most reports, هالك (Scrap) values tend to be LARGER or equal to الاصلاح (Repair) values. If your Repair_Qty is consistently larger than Inspect_Scrap_Qty, you likely swapped them.
+
+## ═══════════════════════════════════════════════════════════════════
 ## COLUMN MAPPING (Read strictly Right-to-Left)
 ## ═══════════════════════════════════════════════════════════════════
 
-Map every table column to the following exact JSON keys in order:
-1. "Item_Name"          -> اسم الصنف
+Map every table column to the following exact JSON keys in order (Right-to-Left as they appear on the page):
+1. "Item_Name"          -> اسم الصنف (RIGHTMOST column)
 2. "Order_No"           -> رقم أمر الإنتاج
 3. "Prod_Sound_Qty"     -> سليم (Production) - MUST BE NUMBER
 4. "Prod_Scrap_Qty"     -> هالك (Production) - MUST BE NUMBER
 5. "Total_Qty"          -> العدد الإجمالي - MUST BE NUMBER
 6. "Inspect_Sound_Qty"  -> سليم (Inspection) - MUST BE NUMBER
-7. "Inspect_Scrap_Qty"  -> هالك (Inspection) - MUST BE NUMBER (CRITICAL: Do not skip this! Default to 0)
-8. "Repair_Qty"         -> الاصلاح - MUST BE NUMBER (CRITICAL: Do not confuse with Scrap! Default to 0)
+7. "Inspect_Scrap_Qty"  -> هالك (Inspection) - THE COLUMN RIGHT NEXT TO سليم. MUST BE NUMBER. Default to 0.
+8. "Repair_Qty"         -> الاصلاح - THE COLUMN AFTER هالك (further left). MUST BE NUMBER. Default to 0. ⚠️ DO NOT SWAP WITH هالك!
 9. "Repair_Reason"      -> سبب الاصلاح
 10. "Notes_Defects"     -> ملاحظات 
 11. "Final_Sound_Qty"   -> سليم (Final) - MUST BE NUMBER
