@@ -1,6 +1,6 @@
 # Daftar Frontend
 
-> A modern, accessible React SPA for the Daftar platform -- prescription analysis, RAG-powered document Q&A, and semantic search.
+> A modern, accessible React SPA for the Daftar platform -- extracting handwritten manufacturing reports.
 
 ---
 
@@ -8,9 +8,7 @@
 
 | Page | Route | Description |
 |------|-------|-------------|
-| Chat | `/` | RAG Q&A -- ask questions and get AI-generated answers grounded in your indexed documents |
-| Search | `/search` | Semantic search across all indexed documents with relevance scoring |
-| Prescription Analysis | `/prescription` | Upload prescription images, get real-time OCR analysis with OpenCV image preprocessing and intelligent medicine candidate suggestions via SSE streaming, then chat about results |
+| Manufacturing Analysis | `/daftar/:section` | Upload images of manufacturing reports (Foam, Sewing, Packing, Shoes) and get real-time OCR extraction via SSE streaming |
 | Login | `/login` | JWT-based authentication |
 | Register | `/register` | Account creation with email verification |
 | Verify Email | `/verify-email` | Email verification flow |
@@ -30,8 +28,7 @@
 | Zustand | Client state management (auth, settings, quota, toast) |
 | Axios | HTTP client with interceptors |
 | React Aria Components | Accessible UI primitives (WAI-ARIA compliant) |
-| react-markdown | Markdown rendering for chat responses |
-| Heroicons | SVG icon library |
+| lucide-react | SVG icon library |
 
 ---
 
@@ -87,31 +84,19 @@ docker run -p 80:80 daftar-frontend
 frontend/
 ├── src/
 │   ├── api/                  # API client modules
-│   │   ├── base.ts           # Health check and base client config
-│   │   ├── client.ts         # Shared Axios instance with JWT interceptors
-│   │   ├── types.ts          # TypeScript type definitions for API responses
-│   │   ├── auth.ts           # Login, register, email verification, resend
-│   │   ├── data.ts           # File upload, processing, asset management
-│   │   ├── nlp.ts            # Vector search, indexing, RAG Q&A
-│   │   └── prescription.ts   # OCR analysis with SSE streaming, prescription chat
 │   ├── components/
 │   │   ├── ui/               # Reusable UI primitives
-│   │   │   ├── Logo.tsx      # SVG logo component
-│   │   │   ├── QuotaPanel.tsx    # Daily usage quota bars
-│   │   │   └── ToastContainer.tsx # Auto-dismissing toast notifications
 │   │   └── layout/           # App layout (Sidebar, MainLayout)
 │   ├── pages/
-│   │   ├── ChatPage.tsx            # RAG document Q&A
-│   │   ├── SearchPage.tsx          # Semantic search
-│   │   ├── PrescriptionPage.tsx    # OCR analysis with real-time progress + chat
+│   │   ├── PrescriptionPage.tsx    # OCR analysis with real-time progress
 │   │   ├── LoginPage.tsx           # User authentication
 │   │   ├── RegisterPage.tsx        # Account creation
 │   │   └── VerifyEmailPage.tsx     # Email verification
 │   ├── stores/
 │   │   ├── authStore.ts      # JWT token + user state (persisted)
 │   │   ├── settingsStore.ts  # API URL + preferences (persisted)
-│   │   ├── quotaStore.ts     # Daily usage tracking (queries, prescriptions)
-│   │   └── toastStore.ts     # Toast notification state (error, warning, info)
+│   │   ├── quotaStore.ts     # Daily usage tracking
+│   │   └── toastStore.ts     # Toast notification state
 │   └── utils/                # Shared utility functions
 ├── public/                   # Static assets
 ├── index.html                # App shell
@@ -130,28 +115,6 @@ The frontend communicates with the Daftar API via Axios. All data routes require
 ```
 Register -> Verify Email -> Login -> Store JWT -> Attach to all API requests
 ```
-
-### Core API Endpoints
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/health` | Health check | No |
-| `POST` | `/api/v1/auth/register` | Create account | No |
-| `POST` | `/api/v1/auth/login` | Get JWT token | No |
-| `GET` | `/api/v1/auth/verify?token=...` | Verify email address | No |
-| `POST` | `/api/v1/auth/resend-verification` | Resend verification email | No |
-| `POST` | `/api/v1/data/upload/{project_id}` | Upload files | Yes |
-| `POST` | `/api/v1/data/process/{project_id}` | Process into chunks | Yes |
-| `DELETE` | `/api/v1/data/asset/{project_id}/{file_id}` | Delete single asset | Yes |
-| `DELETE` | `/api/v1/data/project/{project_id}/assets` | Delete all project assets | Yes |
-| `POST` | `/api/v1/nlp/index/push/{project_id}` | Index to vector DB | Yes |
-| `GET` | `/api/v1/nlp/index/info/{project_id}` | Get index statistics | Yes |
-| `POST` | `/api/v1/nlp/index/search/{project_id}` | Semantic search | Yes |
-| `POST` | `/api/v1/nlp/index/answer/{project_id}` | RAG Q&A | Yes |
-| `POST` | `/api/v1/prescription/analyze` | Analyze prescription (JSON) | Yes |
-| `POST` | `/api/v1/prescription/analyze-stream` | Analyze prescription (SSE) | Yes |
-| `POST` | `/api/v1/prescription/chat` | Chat about prescription results | Yes |
-| `GET` | `/api/v1/quota/status` | Get daily usage quota status | Yes |
 
 ---
 

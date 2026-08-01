@@ -91,9 +91,8 @@ Copy `.env.app.example` to `.env.app` and configure. Key sections:
 | Vector DB | `VECTORDB_BACKEND` (`PGVECTOR` or `QDRANT`) |
 | Auth | `JWT_SECRET`, `JWT_ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
 | Email | `BREVO_API_KEY`, `SENDER_EMAIL`, `FRONTEND_URL` |
-| Rate Limits | `RATE_LIMIT_AUTH`, `RATE_LIMIT_UPLOAD`, `RATE_LIMIT_QUERY`, `RATE_LIMIT_PRESCRIPTION` |
-| Quotas | `QUOTA_DAILY_QUERIES`, `QUOTA_DAILY_PRESCRIPTIONS`, `QUOTA_DAILY_UPLOADS` |
-| Hybrid Search | `HYBRID_SEARCH_ENABLED`, `HYBRID_SEARCH_ALPHA` |
+| Rate Limits | `RATE_LIMIT_AUTH`, `RATE_LIMIT_UPLOAD`, `RATE_LIMIT_QUERY` |
+| Quotas | `QUOTA_DAILY_QUERIES`, `QUOTA_DAILY_UPLOADS` |
 
 See `SRC/.env.example` for the full variable reference with descriptions.
 
@@ -116,53 +115,6 @@ All data is stored in named Docker volumes:
 | `daftar_fastapi_data` | FastAPI | Uploaded assets (mounted at `/app/Assets`) |
 | `daftar_pgvector_data` | PostgreSQL | Database files, vector indexes |
 | `daftar_qdrant_data` | Qdrant | Vector collections |
-
-### Backup & Restore
-
-```bash
-# Backup PostgreSQL volume
-docker run --rm \
-  -v daftar_pgvector_data:/volume \
-  -v $(pwd):/backup \
-  alpine tar cvf /backup/pgvector_backup.tar /volume
-
-# Restore PostgreSQL volume (overwrites existing data)
-docker run --rm \
-  -v daftar_pgvector_data:/volume \
-  -v $(pwd):/backup \
-  alpine sh -c "cd /volume && tar xvf /backup/pgvector_backup.tar --strip 1"
-
-# List all volumes
-docker volume ls
-
-# Remove unused volumes (data loss warning)
-docker volume prune
-```
-
----
-
-## Container Entrypoints
-
-### FastAPI (`minirag/entrypoint.sh`)
-
-```bash
-#!/bin/bash
-set -e
-echo "Running database migrations..."
-cd /app/Models/DB_Schemes/minirag
-alembic upgrade head       # Apply pending migrations
-cd /app
-echo "Starting uvicorn server..."
-exec uvicorn main:app --host 0.0.0.0 --port 8101
-```
-
-### PostgreSQL Healthcheck
-
-```bash
-pg_isready -U postgres     # Checks if database accepts connections
-```
-
-Configured with: interval=5s, timeout=5s, retries=10, start_period=60s
 
 ---
 
@@ -195,12 +147,6 @@ docker compose logs -f daftar_fastapi
 
 # Shell into application container
 docker exec -it daftar_fastapi /bin/bash
-
-# Shell into PostgreSQL
-docker exec -it daftar_pgvector psql -U postgres
-
-# Run migrations manually
-docker exec -it daftar_fastapi bash -c "cd /app/Models/DB_Schemes/minirag && alembic upgrade head"
 ```
 
 ---
@@ -214,14 +160,11 @@ docker exec -it daftar_fastapi bash -c "cd /app/Models/DB_Schemes/minirag && ale
 | Application (via Nginx) | `http://localhost:8999` |
 | Frontend (direct) | `http://localhost:5174` |
 | FastAPI Docs | `http://localhost:8109/docs` |
-| Qdrant Dashboard | `http://localhost:6337/dashboard` |
 
 ### Development (docker-compose.dev.yml)
 
 | Service | URL |
 |---------|-----|
 | Application (via Nginx) | `http://localhost:8999` |
-| PostgreSQL | `localhost:5536` |
-| Qdrant Dashboard | `http://localhost:6337/dashboard` |
 
 Backend and frontend run locally outside Docker in dev mode. See the [root README](../README.md) for the full dev setup.
