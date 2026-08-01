@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ScanLine, FileSpreadsheet } from "lucide-react";
 import { Button } from "../components/ui/Button";
+import { Logo } from "../components/ui/Logo";
 
 // Section display info (matches backend section_registry.py)
 const SECTION_INFO: Record<string, { name: string; nameAr: string }> = {
@@ -116,9 +117,9 @@ export function ProductionPage() {
             <ScanLine className="w-8 h-8 text-primary-600" />
           </div>
           <div className="flex items-center justify-center gap-3">
-            <img src="/ht-logo.png" alt="HT Medical" className="w-10 h-10 object-contain" />
+            <Logo size={40} className="rounded-lg" />
             <h1 className="text-4xl font-bold tracking-tight text-text-primary">
-              HT Scanner — {sectionMeta.name}
+              Daftar — {sectionMeta.name}
             </h1>
           </div>
           <p className="text-lg text-text-muted">

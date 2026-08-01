@@ -69,7 +69,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <Logo size={36} className="rounded-lg" />
             <div className="flex-1 min-w-0">
               <span className="text-lg font-semibold tracking-tight text-text-primary">
-              HT Scanner
+              Daftar
             </span>
             </div>
             {/* Mobile close button — inside sidebar header */}
