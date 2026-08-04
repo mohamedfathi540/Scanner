@@ -6,24 +6,40 @@ Analyze the attached table image and extract all rows into a strictly structured
 
 ### CRITICAL GRID ALIGNMENT & TWO-LINE CELLS:
 1. **14 Columns**: This table has 14 columns. Read strictly from Right to Left. Do not skip blank cells; output 0 for numbers or "" for text.
-2. **Two-Line Item Names**: In the "Item_Name" column (the furthest right), the text is frequently written across TWO lines within the same cell. The Brand Name (HT, MAX, SOOM, H2H, etc.) is usually written on the top line, and the Product Name + Color (e.g., عصعص كحلي, منحدر ك) is written directly underneath it. You MUST merge these two lines together to form a single product name (e.g., "عصعص كحلي MAX"). Do not split them into separate rows!
+2. **ITEM NAME COLUMN ISOLATION**: The "Item_Name" is ONLY in the rightmost (widest) column of the table. This column contains ONLY the product name — no numbers, no annotations. Do NOT read any text from other columns (like ليبول, ثم الاصلاح, اعادة, etc.) as part of the item name — those are notes/decisions in different columns.
+3. **Two-Line Item Names**: The item name cell frequently contains TWO lines of handwriting. These two lines can appear in ANY order:
+   - Pattern A: **Color on top** + **Product + Brand on bottom** (e.g., top="أوف وايت", bottom="مخده ك MAX" → "مخده ك اوف وايت MAX")
+   - Pattern B: **Brand + Color on top** + **Product on bottom** (e.g., top="كحلى MAX", bottom="مخده صغيره" → "مخده صغيره كحلي MAX")
+   - Pattern C: **Brand on top** + **Product + Color on bottom** (e.g., top="MAX", bottom="عصعص كحلي" → "عصعص كحلي MAX")
+   You MUST read BOTH lines, then combine them into one product name: Product + Color + Brand. Do NOT split them into separate rows. Do NOT ignore either line.
 
 ### COLUMN MAPPING (Right-to-Left):
 Map every table column to the following exact JSON keys in order:
-1. "Item_Name"          -> اسم الصنف
-2. "Order_No"           -> رقم أمر الإنتاج
-3. "Delivered_Sound_Qty"-> سليم (الكمية المسلمة للجودة)
-4. "Delivered_Scrap_Qty"-> هالك / اعادة التعديل
-5. "Samples_10_Percent" -> عدد العينات (تحت فحص 10%)
-6. "Accepted_Samples"   -> عدد العينات المقبولة
-7. "Rejected_Samples"   -> عدد العينات المرفوضة
-8. "Addition"           -> اضافة
-9. "Resort_Decision"    -> قرار اعادة للفرز
-10. "Production_Qty"    -> كمية الانتاج
-11. "Samples_30_Percent"-> عدد العينات (تحت فحص 30%)
-12. "Notes"             -> ملاحظات
-13. "Final_Sound_Qty"   -> سليم (اجمالي بعد فحص الجودة)
-14. "Final_Scrap_Qty"   -> هالك (اجمالي بعد فحص الجودة)
+1. "Item_Name"          -> اسم الصنف (Column 1 - Rightmost, widest column, TEXT ONLY)
+2. "Order_No"           -> رقم أمر الإنتاج (Column 2)
+3. "Delivered_Sound_Qty"-> سليم (الكمية المسلمة للجودة) (Column 3)
+4. "Delivered_Scrap_Qty"-> هالك / اعادة التعديل (Column 4)
+5. "Samples_10_Percent" -> عدد العينات (تحت فحص 10%) (Column 5)
+6. "Accepted_Samples"   -> عدد العينات المقبولة (Column 6)
+7. "Rejected_Samples"   -> عدد العينات المرفوضة (Column 7)
+8. "Addition"           -> اضافة (Column 8)
+9. "Resort_Decision"    -> قرار اعادة للفرز (Column 9)
+10. "Production_Qty"    -> كمية الانتاج (Column 10)
+11. "Samples_30_Percent"-> عدد العينات (تحت فحص 30%) (Column 11)
+12. "Notes"             -> ملاحظات (Column 12)
+13. "Final_Sound_Qty"   -> سليم (اجمالي بعد فحص الجودة) (Column 13)
+14. "Final_Scrap_Qty"   -> هالك (اجمالي بعد فحص الجودة) (Column 14 - Leftmost)
+### CRITICAL: COLUMNS 5, 6, 7 — THE SAMPLE INSPECTION GROUP:
+Columns 5 ("Samples_10_Percent"), 6 ("Accepted_Samples"), and 7 ("Rejected_Samples") are a GROUPED set of three NARROW columns under the shared header "عدد العينات" (Sample Count) in the table.
+- **Column 5** (rightmost of the group): The TOTAL number of samples inspected at 10%. This is the WIDEST column in the group.
+- **Column 6** (middle of the group): The number of **ACCEPTED** samples (المقبولة). This is a NARROW sub-column.
+- **Column 7** (leftmost of the group): The number of **REJECTED** samples (المرفوضة). This is a NARROW sub-column.
+
+**MANDATORY MATH CHECK**: Accepted_Samples + Rejected_Samples MUST EQUAL Samples_10_Percent. For example: if Samples_10_Percent=20, Accepted=14, Rejected=6, then 14+6=20 ✓. If your numbers do NOT add up, you have misread a digit or swapped columns — re-examine the cells.
+
+**PHYSICAL LAYOUT**: In the printed form, these three columns sit between "Delivered_Scrap_Qty" (Column 4, to their RIGHT) and "Addition" (Column 8, to their LEFT). The two sub-columns (Accepted/Rejected) are very narrow and close together — be extremely careful to read each number from the correct cell by tracing vertically to the sub-header.
+
+**DO NOT** swap Accepted and Rejected based on which is larger. Rejected CAN exceed Accepted.
 
 ### STRICT NUMERAL & ACCURACY RULES:
 1. **Digit Disambiguation**:
@@ -35,11 +51,14 @@ Map every table column to the following exact JSON keys in order:
 
 ### COMMON HANDWRITING MISREADS (ROSETTA STONE):
 This specific handwriting has cursive connections that you MUST visually correct before matching to the product list:
-1. "عصعص" vs "ناسور": If a word looks like "ناسور" (fistula) or "مسند ظهر" but starts with a looping 'ع', it is actually "عصعص". You MUST always output this structural shape as "Oval seat". 
+1. "عصعص" vs "ناسور": If a word looks like "ناسور" (fistula) or "مسند ظهر" but starts with a looping 'ع', it is actually "عصعص".
 2. "كحلي" vs "كلي": If you read a color as "كلي", it is actually "كحلي" (Navy Blue). The 'ح' is often compressed.
 3. "شيت مربع" vs "صندوق": If a word looks like "صندوق MAX", it is actually "شيت مربع MAX" (Square sheet).
 4. "يو" vs "يد": If you read "حوامل يد", it is actually "حوامل يو" (U-shaped).
-5. "شنط" (Bags) Group Header: If you see the word "شنط" written with a bracket or acting as a header for the rows beneath it, you MUST prepend the word "شنطة" (bag) to all the product names in the subsequent rows until the group ends. For example, if the header is "شنط" and the following rows are "رقبة" and "حديثة", you must extract them as "شنطة رقبة" and "شنطة حديثة".
+5. **"شنط" / "شنطات" (Bags) Group Header**: If you see the word "شنط" or "شنطات" written as a header for the rows beneath it, you MUST prepend the word "شنطة" (bag) to all the product names in the subsequent rows until the group ends. For example: header="شنط", rows below="بواسير ك", "مسند وسط", "حديثة" → extract as "شنطة بواسير كبيرة", "شنطة مسند وسط", "شنطة حديثة".
+6. **"مخده" (Pillow) Products**: This word appears very frequently. Abbreviations: "مخده ك" = "مخده كبيره", "مسند ك" = "مسند كبير". Common variants: "مخده صغيره", "مخده كبيره", "مخده وسط", "مخده كلاسيك", "مخده مطوره". Do NOT confuse "مخده" with "عصعص" or "ناسور" or "مموج" — these are completely different products.
+7. **"مسند" (Support) Products**: "مسند وسط" and "مسند كبير" and "مسند صغير" are common. "مسند ك" is short for "مسند كبير". Do NOT confuse "مسند وسط" with "مموج" — they look different.
+8. **Read BOTH lines before matching**: If the cell has two lines, read BOTH and combine them BEFORE searching the master list. A common error is reading only one line and matching it to the wrong product.
 
 By applying these visual corrections first, you will easily find the correct match in the master product list.
 
@@ -51,15 +70,18 @@ You MUST construct the "Item_Name" by matching the handwriting strictly to the c
 
 ### STEP 1: THE SCRATCHPAD (MANDATORY)
 Before generating JSON, create a `<scratchpad>` block. Go through the table row by row.
-For EACH row, you MUST explicitly document your reasoning for the "Item_Name":
-1. Write the naive visual reading of the item name, making sure to COMBINE the top line (Brand) and bottom line (Product+Color) if it is written on two lines in the same cell.
-2. Check the "ROSETTA STONE" rules above. Did you read "صندوق", "مسند ظهر", "ناسور", "يد", or "كلي"? If so, CORRECT IT NOW based on the rule.
-3. Find the EXACT match in the 356-product Master List. You MUST output a name that exists in the list.
+For EACH row, you MUST explicitly document your reasoning:
+1. **Item Name — Two-Line Check**: First, note if the cell has one or two lines. If two lines, write: "Line 1=[text], Line 2=[text]". Then combine them into one product name (Product + Color + Brand). Do NOT read text from adjacent columns — only from the rightmost wide column.
+2. **Rosetta Stone Check**: Did you read "صندوق", "مسند ظهر", "كلي"? Correct per the rules. Is the cell under a "شنط" group? If yes, prepend "شنطة".
+3. **Master List Match**: Find the EXACT match in the product list. You MUST output a name that exists in the list. If unsure between two similar products, prefer the one that uses all the text you read from both lines.
 4. Write out all 14 columns separated by a pipe `|`. If a column is blank, write `BLANK`.
+5. **Sample Math Check**: Verify Accepted_Samples + Rejected_Samples = Samples_10_Percent. Write: "Samples=X, Accepted=Y, Rejected=Z. Y+Z=X? [YES/NO]". If NO, re-read those cells.
 
 Example Scratchpad Reasoning:
-Row 1: Naive="صندوق MAX". Rosetta Rule="شيت مربع MAX". Match in list="شيت مربع اسود MAX". | شيت مربع اسود MAX | 123 | 50 | 0 ...
-Row 2: Naive="مسند ظهر". Rosetta Rule="عصعص". Match in list="Oval seat أسود HT". | Oval seat أسود HT | 456 | 20 | ...
+Row 1: Two lines: Line1="أوف وايت", Line2="مخده ك MAX". Combined="مخده كبيره اوف وايت MAX". Match in list="مخده كبيره اوف وايتMAX". Samples=20, Accepted=14, Rejected=6. 14+6=20? YES. | مخده كبيره اوف وايتMAX | ... | 20 | 14 | 6 | ...
+Row 2: Two lines: Line1="كحلى MAX", Line2="مخده صغيره". Combined="مخده صغيره كحلي MAX". Match in list="مخده صغيره كحلي MAX". | مخده صغيره كحلي MAX | ...
+Row 6: Single line: "بواسير ك". Under شنط group, so prepend شنطة. "ك" = "كبيرة". Match in list="شنطة بواسير كبيرة". | شنطة بواسير كبيرة | ...
+Row 7: Single line: "مسند وسط". Under شنط group. Match in list="شنطة مسند وسط". | شنطة مسند وسط | ...
 
 ### STEP 2: JSON GENERATION
 Output ONLY the JSON array containing the 14 keys defined above.

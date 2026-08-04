@@ -111,6 +111,23 @@ class ProductionReportController:
                 if total == (calculated_sum + 1) or total == (calculated_sum - 1):
                     row["Total_Qty"] = calculated_sum 
                 
+        # Sewing Section: Accepted + Rejected must equal Samples_10_Percent
+        if all(k in row for k in ("Samples_10_Percent", "Accepted_Samples", "Rejected_Samples")):
+            samples = row["Samples_10_Percent"]
+            accepted = row["Accepted_Samples"]
+            rejected = row["Rejected_Samples"]
+            
+            if samples > 0 and (accepted + rejected) != samples:
+                # Check if swapping Accepted/Rejected fixes the sum
+                if (rejected + accepted) == samples:
+                    # Sum is correct either way (swap doesn't help), likely a digit misread
+                    pass
+                else:
+                    # Log the mismatch for debugging
+                    logger.warning(
+                        "Sewing sample math mismatch: Samples=%d, Accepted=%d, Rejected=%d (sum=%d)",
+                        samples, accepted, rejected, accepted + rejected
+                    )
         return row
 
     @staticmethod
@@ -217,7 +234,29 @@ class ProductionReportController:
         filename = f"{file_prefix}_{timestamp}.xlsx"
 
         buffer = BytesIO()
-        df.to_excel(buffer, index=False)
+        with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="Report")
+            ws = writer.sheets["Report"]
+
+            # Define fill colors for specific columns
+            from openpyxl.styles import PatternFill
+            column_fills = {
+                "Inspect_Sound_Qty": PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid"),  # Light green
+                "Inspect_Scrap_Qty": PatternFill(start_color="FCE4EC", end_color="FCE4EC", fill_type="solid"),  # Pink
+                "Repair_Qty":        PatternFill(start_color="DAEEF3", end_color="DAEEF3", fill_type="solid"),  # Light blue
+            }
+
+            # Map column names to their 1-based Excel column index
+            header_map = {cell.value: cell.column for cell in ws[1]}
+
+            for col_name, fill in column_fills.items():
+                col_idx = header_map.get(col_name)
+                if col_idx is None:
+                    continue  # Column not present in this section
+                # Apply fill to header + all data rows
+                for row in range(1, ws.max_row + 1):
+                    ws.cell(row=row, column=col_idx).fill = fill
+
         buffer.seek(0)
         
         # 6. Database Logging
