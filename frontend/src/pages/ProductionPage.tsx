@@ -128,13 +128,6 @@ export function ProductionPage() {
         </div>
 
         <div className="w-full max-w-md bg-bg-secondary p-8 rounded-2xl border border-border shadow-sm flex flex-col items-center">
-          {section === "packing" ? (
-            <div className="w-full h-64 border-2 border-dashed border-primary-500 bg-primary-50 rounded-xl flex flex-col items-center justify-center space-y-4">
-              <div className="text-5xl">🚧</div>
-              <h2 className="text-2xl font-bold text-primary-700">Under Process</h2>
-              <p className="text-primary-600 font-medium">هذا القسم قيد التنفيذ حالياً</p>
-            </div>
-          ) : (
             <>
               <label
                 htmlFor="file-upload"
@@ -199,7 +192,6 @@ export function ProductionPage() {
                 {isUploading ? "Extracting..." : `Extract to Excel`}
               </Button>
             </>
-          )}
         </div>
       </div>
     </div>
