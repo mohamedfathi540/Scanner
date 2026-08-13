@@ -10,8 +10,8 @@ Analyze the attached table image and extract all rows into a strictly structured
 3. **Two-Line Item Names**: The item name cell frequently contains TWO lines of handwriting. These two lines can appear in ANY order:
    - Pattern A: **Color on top** + **Product + Brand on bottom** (e.g., top="أوف وايت", bottom="مخده ك MAX" → "مخده ك اوف وايت MAX")
    - Pattern B: **Brand + Color on top** + **Product on bottom** (e.g., top="كحلى MAX", bottom="مخده صغيره" → "مخده صغيره كحلي MAX")
-13. - Pattern C: **Brand on top** + **Product + Color on bottom** (e.g., top="MAX", bottom="عصعص كحلي" → "عصعص كحلي MAX")
-14.    You MUST read BOTH lines carefully, then combine them into one product name: Product + Color + Brand. Do NOT split them into separate rows. Do NOT ignore either line. Do NOT hallucinate "مخده" if it is not written.
+   - Pattern C: **Brand on top** + **Product + Color on bottom** (e.g., top="MAX", bottom="عصعص كحلي" → "عصعص كحلي MAX")
+   You MUST read BOTH lines, then combine them into one product name: Product + Color + Brand. Do NOT split them into separate rows. Do NOT ignore either line.
 
 ### COLUMN MAPPING (Right-to-Left):
 Map every table column to the following exact JSON keys in order:
@@ -57,23 +57,18 @@ This specific handwriting has cursive connections that you MUST visually correct
 4. "يو" vs "يد": If you read "حوامل يد", it is actually "حوامل يو" (U-shaped).
 5. **"شنط" / "شنطات" (Bags) Group Header**: If you see the word "شنط" or "شنطات" written as a header for the rows beneath it, you MUST prepend the word "شنطة" (bag) to all the product names in the subsequent rows until the group ends. For example: header="شنط", rows below="بواسير ك", "مسند وسط", "حديثة" → extract as "شنطة بواسير كبيرة", "شنطة مسند وسط", "شنطة حديثة".
 6. **"مخده" (Pillow) Products**: This word appears very frequently. Abbreviations: "مخده ك" = "مخده كبيره", "مسند ك" = "مسند كبير". Common variants: "مخده صغيره", "مخده كبيره", "مخده وسط", "مخده كلاسيك", "مخده مطوره". Do NOT confuse "مخده" with "عصعص" or "ناسور" or "مموج" — these are completely different products.
-60. 7. **"مسند" (Support) Products**: "مسند وسط" and "مسند كبير" and "مسند صغير" are common. "مسند ك" is short for "مسند كبير". Do NOT confuse "مسند وسط" with "مموج" — they look different.
-61. 8. **"بواسير كولد" vs "بواسير كوله"**: The word "كولد" is sometimes written in cursive looking like "كوله". If you read "بواسير كوله" or "بواسير كوله", it is actually "بواسير كولد".
-62. 9. **"أوف MAX"**: If you see "أوف MAX" on top, it means "أوف وايت MAX". For example, top "أوف MAX" and bottom "ناسور يو" -> "ناسور يو أوف وايت MAX".
-63. 10. **Read BOTH lines before matching**: If the cell has two lines, read BOTH and combine them BEFORE searching the master list. A common error is reading only one line and matching it to the wrong product, or hallucinating "مخده كبيره" for every row. Read the actual handwriting!
-64. 11. **MISSING ITEM EXCEPTION**: If you clearly read a product or combination that is completely missing from the list, you MUST extract it EXACTLY as written. DO NOT force it to match an incorrect product.
-65. 12. **STRICT COMBINATION MAPPINGS**: If you see the following combinations across two lines, you MUST extract them exactly as shown here, combining both lines:
-66. - Top "اسود MAX", Bottom "ناسور يو" -> "ناسور يو اسود MAX"
-67. - Top "كحلى MAX", Bottom "ناسور يو" (or "ناسوريو") -> "ناسور يو كحلى MAX"
-68. - Top "أوف MAX" or "أوف وايت MAX", Bottom "ناسور يو" -> "ناسور يو اوف وايت MAX"
-69. - Top "كحلى HT", Bottom "بواسير كولد" -> "بواسير كولد كحلى HT"
-70. - Top "اسود HT", Bottom "بواسير كولد" -> "بواسير كولد اسود HT"
-71. - Top "اسود MAX", Bottom "بواسير كولد" -> "بواسير كولد اسود MAX"
-72. - Top "كحلى MAX", Bottom "بواسير كولد" or "بواسير كوله" -> "بواسير كولد كحلي MAX"
-73. - Top "كحلى MAX", Bottom "بواسير ميموري" -> "بواسير ميموري كحلي MAX"
-74. - Top "سرير بيبي دبل نت", Bottom "منحدر أطفال" -> "سرير بيبي دبل نت منحدر أطفال"
-75. - Top "بيبي دبل نت", Bottom "ميكي سرير" -> "بيبي دبل نت ميكي سرير"
-76. - Top "بيبي دبل نت", Bottom "نصف دائري" -> "بيبي دبل نت نصف دائري"
+7. **"مسند" (Support) Products**: "مسند وسط" and "مسند كبير" and "مسند صغير" are common. "مسند ك" is short for "مسند كبير". Do NOT confuse "مسند وسط" with "مموج" — they look different.
+8. **Read BOTH lines before matching**: If the cell has two lines, read BOTH and combine them BEFORE searching the master list. A common error is reading only one line and matching it to the wrong product.
+9. **MISSING ITEM EXCEPTION**: If you clearly read a product or combination that is completely missing from the list, you MUST extract it EXACTLY as written. DO NOT force it to match an incorrect product (e.g., do not force "اسود" to become "كحلي").
+10. **STRICT COMBINATION MAPPINGS**: If you see the following combinations across two lines, you MUST extract them exactly as shown here, combining both lines:
+- Top "اسود MAX", Bottom "ناسور يو" -> "ناسور يو اسود MAX"
+- Top "كحلى MAX", Bottom "ناسور يو" (or "ناسوريو") -> "ناسور يو كحلى MAX"
+- Top "كحلى HT", Bottom "بواسير كولد" -> "بواسير كولد كحلى HT"
+- Top "اسود HT", Bottom "بواسير كولد" -> "بواسير كولد اسود HT"
+- Top "اسود MAX", Bottom "بواسير كولد" -> "بواسير كولد اسود MAX"
+- Top "سرير بيبي دبل نت", Bottom "منحدر أطفال" -> "سرير بيبي دبل نت منحدر أطفال"
+- Top "بيبي دبل نت", Bottom "ميكي سرير" -> "بيبي دبل نت ميكي سرير"
+- Top "بيبي دبل نت", Bottom "نصف دائري" -> "بيبي دبل نت نصف دائري"
 
 By applying these visual corrections first, you will easily find the correct match in the master product list.
 
@@ -93,11 +88,11 @@ For EACH row, you MUST explicitly document your reasoning:
 4. Write out all 14 columns separated by a pipe `|`. If a column is blank, write `BLANK`.
 5. **Sample Math Check**: Verify Accepted_Samples + Rejected_Samples = Samples_10_Percent. Write: "Samples=X, Accepted=Y, Rejected=Z. Y+Z=X? [YES/NO]". If NO, re-read those cells.
 
-91. Example Scratchpad Reasoning (⚠️ THESE ARE FICTIONAL EXAMPLES - DO NOT COPY THEM! READ THE ACTUAL IMAGE!):
-92. Example Row A: Two lines: Line1="كحلى MAX", Line2="ناسور يو". Combined="ناسور يو كحلى MAX". Match in list="ناسور يو كحلى MAX". Samples=20, Accepted=14, Rejected=6. 14+6=20? YES. | ناسور يو كحلى MAX | ... | 20 | 14 | 6 | ...
-93. Example Row B: Two lines: Line1="أوف MAX", Line2="بواسير كولد". Combined="بواسير كولد اوف وايت MAX". Match in list="بواسير كولد اوف وايت MAX". | بواسير كولد اوف وايت MAX | ...
-94. Example Row C: Single line: "بواسير ك". Under شنط group, so prepend شنطة. "ك" = "كبيرة". Match in list="شنطة بواسير كبيرة". | شنطة بواسير كبيرة | ...
-95. Example Row D: Single line: "مسند وسط". Under شنط group. Match in list="شنطة مسند وسط". | شنطة مسند وسط | ...
+Example Scratchpad Reasoning (⚠️ THESE ARE FICTIONAL EXAMPLES - DO NOT COPY THEM! READ THE ACTUAL IMAGE!):
+Example Row A: Two lines: Line1="أوف وايت", Line2="مخده ك MAX". Combined="مخده كبيره اوف وايت MAX". Match in list="مخده كبيره اوف وايتMAX". Samples=20, Accepted=14, Rejected=6. 14+6=20? YES. | مخده كبيره اوف وايتMAX | ... | 20 | 14 | 6 | ...
+Example Row B: Two lines: Line1="كحلى MAX", Line2="مخده صغيره". Combined="مخده صغيره كحلي MAX". Match in list="مخده صغيره كحلي MAX". | مخده صغيره كحلي MAX | ...
+Example Row C: Single line: "بواسير ك". Under شنط group, so prepend شنطة. "ك" = "كبيرة". Match in list="شنطة بواسير كبيرة". | شنطة بواسير كبيرة | ...
+Example Row D: Single line: "مسند وسط". Under شنط group. Match in list="شنطة مسند وسط". | شنطة مسند وسط | ...
 
 ### STEP 2: JSON GENERATION
 Output ONLY the JSON array containing the 14 keys defined above.
