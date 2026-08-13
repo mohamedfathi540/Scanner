@@ -55,12 +55,17 @@ This specific handwriting has cursive connections that you MUST visually correct
 2. "كحلي" vs "كلي": If you read a color as "كلي", it is actually "كحلي" (Navy Blue). The 'ح' is often compressed.
 3. "شيت مربع" vs "صندوق": If a word looks like "صندوق MAX", it is actually "شيت مربع MAX" (Square sheet).
 4. "يو" vs "يد": If you read "حوامل يد", it is actually "حوامل يو" (U-shaped).
-5. **"شنط" / "شنطات" (Bags) Group Header**: If you see the word "شنط" or "شنطات" written as a header for the rows beneath it, you MUST prepend the word "شنطة" (bag) to all the product names in the subsequent rows until the group ends. For example: header="شنط", rows below="بواسير ك", "مسند وسط", "حديثة" → extract as "شنطة بواسير كبيرة", "شنطة مسند وسط", "شنطة حديثة".
+5. **"شنط" / "شنطات" (Bags) Group Header**: If you see the word "شنط" or "شنطات" written as a header for the rows beneath it, you MUST prepend the word "شنطة" (bag) to all the product names in the subsequent rows until the group ends. For example: header="شنط", rows below="بواسير ك", "مسند وسط", "حديثة" -> extract as "شنطة بواسير كبيرة", "شنطة مسند وسط", "شنطة حديثة".
 6. **"مخده" (Pillow) Products**: This word appears very frequently. Abbreviations: "مخده ك" = "مخده كبيره", "مسند ك" = "مسند كبير". Common variants: "مخده صغيره", "مخده كبيره", "مخده وسط", "مخده كلاسيك", "مخده مطوره". Do NOT confuse "مخده" with "عصعص" or "ناسور" or "مموج" — these are completely different products.
 7. **"مسند" (Support) Products**: "مسند وسط" and "مسند كبير" and "مسند صغير" are common. "مسند ك" is short for "مسند كبير". Do NOT confuse "مسند وسط" with "مموج" — they look different.
-8. **Read BOTH lines before matching**: If the cell has two lines, read BOTH and combine them BEFORE searching the master list. A common error is reading only one line and matching it to the wrong product.
-9. **MISSING ITEM EXCEPTION**: If you clearly read a product or combination that is completely missing from the list, you MUST extract it EXACTLY as written. DO NOT force it to match an incorrect product (e.g., do not force "اسود" to become "كحلي").
-10. **STRICT COMBINATION MAPPINGS**: If you see the following combinations across two lines, you MUST extract them exactly as shown here, combining both lines:
+8. **"بواسير كولد" vs "بواسير ميموري" vs "بيضاوي ك"**: DO NOT hallucinate "كولد" (Cold) if the word clearly says "ميموري" (Memory) or "بيضاوي" (Oval). "بواسير ميموري" and "بواسير كولد" are different. If you see "بيضاوي ك", do not force it into "بواسير كولد". 
+9. **Read BOTH lines before matching**: If the cell has two lines, read BOTH and combine them BEFORE searching the master list. A common error is reading only one line and matching it to the wrong product.
+10. **MISSING ITEM EXCEPTION**: If you clearly read a product or combination that is completely missing from the list, you MUST extract it EXACTLY as written. DO NOT force it to match an incorrect product (e.g., do not force "اسود" to become "كحلي", and do not force "ميموري" to become "كولد").
+11. **STRICT COMBINATION MAPPINGS**: If you see the following combinations across two lines, you MUST extract them exactly as shown here, combining both lines:
+- Top "كحلي", Bottom "بيضاوي ك" (or vice versa) -> extract as "بيضاوي ك كحلي"
+- Top "كحلى HT", Bottom "بواسير ميمورى" -> "بواسير ميموري كحلي HT"
+- Top "كحلى MAX", Bottom "بواسير ميمورى" -> "بواسير ميموري كحلي MAX"
+- Top "اسود MAX", Bottom "مسند ك" -> "مسند كبير اسود MAX"
 - Top "اسود MAX", Bottom "ناسور يو" -> "ناسور يو اسود MAX"
 - Top "كحلى MAX", Bottom "ناسور يو" (or "ناسوريو") -> "ناسور يو كحلى MAX"
 - Top "كحلى HT", Bottom "بواسير كولد" -> "بواسير كولد كحلى HT"
