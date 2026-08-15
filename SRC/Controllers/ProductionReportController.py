@@ -133,39 +133,85 @@ class ProductionReportController:
     @staticmethod
     def _extract_json_from_response(raw_response: str) -> str:
         """
-        Strip the <scratchpad> block and any markdown fences from the AI
-        response, then extract the JSON array.
-
-        The AI now outputs:
-            <scratchpad>...thinking...</scratchpad>
-            ```json
-            [ { ... }, { ... } ]
-            ```
-        We need to isolate just the JSON array.
+        Robustly extract a JSON array from the AI response, handling:
+        - <scratchpad> blocks (closed or unclosed)
+        - Markdown code fences (single, nested, or multiple)
+        - JSON objects {} instead of arrays []
+        - Truncated JSON (from MAX_TOKENS cutoff)
+        - Trailing commas and other common LLM JSON quirks
         """
         text = raw_response.strip()
 
-        # 1. Remove the entire <scratchpad>...</scratchpad> block
+        # Log raw response length for debugging
+        logger.debug("Raw AI response length: %d chars", len(text))
+
+        # 1. Remove <scratchpad>...</scratchpad> blocks (greedy — handles unclosed tags too)
+        #    First try the well-formed case
         text = re.sub(
             r'<scratchpad>.*?</scratchpad>',
             '',
             text,
             flags=re.DOTALL | re.IGNORECASE
         )
+        #    If the AI forgot to close the scratchpad, remove everything from <scratchpad> to
+        #    the first occurrence of ``` or [ (whichever comes first)
+        if re.search(r'<scratchpad>', text, re.IGNORECASE):
+            text = re.sub(
+                r'<scratchpad>.*?(?=```|\[)',
+                '',
+                text,
+                flags=re.DOTALL | re.IGNORECASE
+            )
 
-        # 2. Remove markdown code fences
-        text = text.strip()
-        text = re.sub(r'^```(?:json)?\s*', '', text)
-        text = re.sub(r'\s*```$', '', text)
-        text = text.strip()
+        # 2. Extract content from markdown code fences (handles nested/multiple fences)
+        #    Look for ```json ... ``` blocks and extract the content
+        fence_pattern = re.compile(r'```(?:json)?\s*\n?(.*?)\n?\s*```', re.DOTALL)
+        fence_matches = fence_pattern.findall(text)
+        if fence_matches:
+            # Use the LAST fence match (the AI sometimes has multiple, the JSON is usually last)
+            for match in reversed(fence_matches):
+                candidate = match.strip()
+                if candidate.startswith('[') or candidate.startswith('{'):
+                    text = candidate
+                    break
+            else:
+                # None of the fence matches looked like JSON, use the last one anyway
+                text = fence_matches[-1].strip()
+        else:
+            # No fences found — strip any stray fence markers
+            text = re.sub(r'```(?:json)?\s*', '', text)
+            text = re.sub(r'\s*```', '', text)
+            text = text.strip()
 
         # 3. Find the JSON array — grab everything from first '[' to last ']'
         start = text.find('[')
         end = text.rfind(']')
         if start != -1 and end != -1 and end > start:
             text = text[start:end + 1]
+        elif text.strip().startswith('{'):
+            # AI returned a single JSON object instead of an array — wrap it
+            obj_start = text.find('{')
+            obj_end = text.rfind('}')
+            if obj_start != -1 and obj_end != -1 and obj_end > obj_start:
+                text = '[' + text[obj_start:obj_end + 1] + ']'
+                logger.info("Wrapped single JSON object into an array")
 
-        return text
+        # 4. Fix truncated JSON (response cut off mid-array by MAX_TOKENS)
+        #    If the JSON doesn't end with ']', try to repair it
+        stripped = text.strip()
+        if stripped.startswith('[') and not stripped.endswith(']'):
+            logger.warning("Detected truncated JSON array — attempting repair")
+            # Find the last complete object (ends with '}')
+            last_brace = stripped.rfind('}')
+            if last_brace != -1:
+                text = stripped[:last_brace + 1] + ']'
+                logger.info("Repaired truncated JSON by closing array after last complete object")
+
+        # 5. Fix trailing commas before closing brackets (common LLM mistake)
+        text = re.sub(r',\s*\]', ']', text)
+        text = re.sub(r',\s*\}', '}', text)
+
+        return text.strip()
 
     async def process_report_to_excel(self, file: UploadFile, db: Session, section: str = "foam"):
         # Validate section
@@ -188,10 +234,14 @@ class ProductionReportController:
         try:
             # 1. Call the AI with the enhanced image and the section-specific prompt
             prompt = self.template_parser.get_production_prompt(section)
+            # Packing section has a massive product master list (~300+ items) which
+            # causes the scratchpad to be very large. Give it more room to avoid
+            # truncation that leads to invalid JSON.
+            token_limit = 32768 if section == "packing" else 16384
             json_response = self.ocr_provider.ocr_image(
                 temp_path,
                 prompt,
-                max_output_tokens=16384,  # Extra room for scratchpad + JSON
+                max_output_tokens=token_limit,
             )
         finally:
             os.remove(temp_path)
@@ -202,15 +252,28 @@ class ProductionReportController:
         # 2. Parse the response: strip scratchpad, extract JSON
         clean_json = self._extract_json_from_response(json_response)
         
-        logger.info(f"AI Clean JSON: {clean_json}")
+        logger.info("AI Clean JSON (first 500 chars): %s", clean_json[:500])
         
         try:
             data = json.loads(clean_json)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             logger.error(
-                "Failed to parse JSON from AI response. Raw (first 1000 chars): %s",
-                json_response[:1000]
+                "Failed to parse JSON from AI response.\n"
+                "  JSON error: %s (line %d, col %d)\n"
+                "  Cleaned JSON (first 500 chars): %s\n"
+                "  Raw response (first 1500 chars): %s",
+                e.msg, e.lineno, e.colno,
+                clean_json[:500],
+                json_response[:1500]
             )
+            raise ValueError("Failed to parse response into valid JSON structure.")
+        
+        # Handle case where AI returned a single object instead of a list
+        if isinstance(data, dict):
+            logger.info("AI returned a single JSON object — wrapping into a list")
+            data = [data]
+        elif not isinstance(data, list):
+            logger.error("AI returned unexpected JSON type: %s", type(data).__name__)
             raise ValueError("Failed to parse response into valid JSON structure.")
             
         # 3. Python Regex Cleaning & Math Integrity Check
