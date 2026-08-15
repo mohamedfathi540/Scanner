@@ -60,5 +60,5 @@ async def upload_production_report(
         logger.error(f"Error processing report: {e}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"message": "An error occurred while processing the report."}
+            content={"message": f"An error occurred while processing the report. Details: {e}"}
         )
