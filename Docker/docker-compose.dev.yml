@@ -48,6 +48,29 @@ services:
           cpus: '0.5'    # Max half a CPU core
           memory: 512M   # Max 512MB RAM
 
+  backend_dev:
+    build:
+      context: ..
+      dockerfile: Docker/minirag/Dockerfile
+    container_name: daftar_backend_dev
+    ports:
+      - "8102:8101" # Changed to 8102 to avoid conflicts with your current setup
+    volumes:
+      - ../SRC:/app # Mount local code for hot reloading
+      - /srv/mergerfs/2TB/daftar_hf_cache:/app/cache # Same as production for HF cache
+    env_file:
+      - ../SRC/.env
+    environment:
+      - POSTGRES_HOST=pgvector
+      - POSTGRES_PORT=5432
+      - HF_HOME=/app/cache
+    networks:
+      - backend
+    restart: unless-stopped
+    depends_on:
+      pgvector:
+        condition: service_healthy
+
 networks:
   backend:
     driver: bridge
@@ -55,3 +78,4 @@ networks:
 volumes:
   pgvector_dev_data:
     driver: local
+
